@@ -1,0 +1,7 @@
+{
+    "general_prompt": "#Goal#\nYou are a medical exam expert. Answer the multiple-choice question.\nYou are NOT given the correct answer in advance. Choose the single best option.\nDo not assume any external retrieved passages; rely only on the question and your own medical knowledge.\n\n#Question#\n{}\n\n#Answer format#\nReasoning: <brief reasoning>\nFinal answer: <one letter among A/B/C/D/E>",
+    "key_names_list": [
+        ["question_with_options"]
+    ],
+    "list_placeholder": "list_placeholder"
+}

@@ -1,0 +1,26 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+wandb/
+*.log
+results/medqa_intent_test1273_eval/
+results/medqa_intent_test1273_reeval_*/
+.modelscope_packs/
+
+# Large assets: host on ModelScope (see README); keep local copies untracked
+parameters/QF_Base_300M/
+parameters/QF_Struct_300M/
+parameters/MiniMind_Base_300M/
+parameters/MiniMind_Struct_300M/
+parameters/sft_QF_en_1024.pth
+out/run_sft_intent/*.pth
+dataset/SlimPajama-1B_full.jsonl
+dataset/openhermes2_5.jsonl
+dataset/pretrain_hq_zh.jsonl
+dataset/sft_mini_512_zh.jsonl
+dataset/RAG_MedQA_US_train_10178_intent.json
+dataset/RAG_MedQA_US_dev_1272_intent.json
+dataset/RAG_MedQA_US_test_1273_intent.json
+dataset/pipeline/models/
+dataset/pipeline_data/

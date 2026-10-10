@@ -1,0 +1,16 @@
+numpy==2.4.4
+pandas==3.0.2
+scikit-learn==1.8.0
+torch>=2.0.0
+transformers>=4.37.0
+wandb==0.25.1
+tqdm
+datasets
+matplotlib
+scipy
+
+# 仅华为昇腾需要：
+# torch_npu>=2.2.0
+
+# 论文下游评测（可选）：
+# lm-eval==0.4.9

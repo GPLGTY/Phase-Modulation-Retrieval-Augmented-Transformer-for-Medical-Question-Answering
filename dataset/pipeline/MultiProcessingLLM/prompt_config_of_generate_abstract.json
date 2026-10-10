@@ -1,0 +1,9 @@
+{
+    "general_prompt": "你是一位专业的汉语言文学专家，给定以下文档：\n\n{}\n\n请依据上述文档内容，撰写不超过500字的摘要：",
+    "key_names_list": [
+        [
+            "total_text"
+        ]
+    ],
+    "list_placeholder": "list_placeholder"
+}

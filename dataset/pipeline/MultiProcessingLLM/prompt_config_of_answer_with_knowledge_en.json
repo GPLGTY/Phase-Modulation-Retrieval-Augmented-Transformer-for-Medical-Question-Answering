@@ -1,0 +1,8 @@
+{
+    "general_prompt": "#Goal#\nYou are a medical exam expert. Answer the multiple-choice question.\nYou are NOT given the correct answer in advance. Choose the single best option.\n\n#Retrieved knowledge#\nThe knowledge retrieved from the knowledge base is as follows:\n<knowledge>\n{}\n</knowledge>\nIf the retrieved knowledge is irrelevant or insufficient, rely on your own medical knowledge.\n\n#Question#\n{}\n\n#Answer format#\nReasoning: <brief reasoning>\nFinal answer: <one letter among A/B/C/D/E>",
+    "key_names_list": [
+        ["knowledges_for_llm"],
+        ["question_with_options"]
+    ],
+    "list_placeholder": "list_placeholder"
+}
