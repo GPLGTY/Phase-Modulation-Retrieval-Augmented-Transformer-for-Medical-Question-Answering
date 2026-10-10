@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 在 MedQA Intent 测试集上评测，结果写入 results/ 下自建目录，并与参考 summary 对比。
-# 默认评测设置与参考最优一致: temperature=0.7, ntk_alpha=0.4
+# 默认评测设置: temperature=0.7, ntk_alpha=0.4
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
@@ -38,4 +38,3 @@ python3 "$ROOT/scripts/run_ablation_temp_ntk.py" \
 echo
 echo "本次结果: $RESULTS/summary.csv"
 echo "参考结果: $ROOT/results/medqa_intent_test1273_reference/summary.csv"
-echo "参考最优: temperature=0.7 ntk_alpha=0.4 → 1197/1273 ≈ 0.9403"

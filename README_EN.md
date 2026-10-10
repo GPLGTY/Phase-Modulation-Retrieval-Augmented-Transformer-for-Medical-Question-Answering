@@ -5,7 +5,7 @@
 
 中文说明：[README.md](README.md) / [README_CN.md](README_CN.md)
 
-This repository provides the full training and evaluation pipeline for a phase-modulation retrieval-augmented Transformer on MedQA: code, data scripts, and reference results. **Large weights / corpora / embeddings are hosted on ModelScope** (see below). Reference best **1197/1273 ≈ 0.9403** (`temperature=0.7`, `ntk_alpha=0.4`); re-eval of shipped best ≈ **1199/1273 ≈ 0.9419**.
+This repository provides the full training and evaluation pipeline for a phase-modulation retrieval-augmented Transformer on MedQA: code, data scripts, and reference results. **Large weights / corpora / embeddings are hosted on ModelScope** (see below).
 
 > Training uses seed `1337`; tiny GPU nondeterminism may remain. After the same recipe, test accuracy should be near the reference.
 
@@ -466,7 +466,7 @@ TEMPS=0.7 NTKS=0.4 \
   bash scripts/eval_medqa_test.sh
 ```
 
-Defaults match the reference best: `temperature=0.7`, `ntk_alpha=0.4`.
+Defaults: `temperature=0.7`, `ntk_alpha=0.4`.
 
 Full grid:
 
@@ -488,8 +488,6 @@ TEMPS=0.7,0.9,1.1,1.3,1.5 NTKS=0.4,0.6,0.8,1.0,1.2 \
 | `n_match` | Predictions matching `answer_idx` |
 | `accuracy` | `n_match / n_scored` |
 | `output_csv` | Per-example CSV |
-
-**Reference best**: temp=0.7, ntk=0.4 → **1197 / 1273 ≈ 0.9403**.
 
 ```bash
 python -c "import pandas as pd; print(pd.read_csv('results/medqa_intent_test1273_eval/summary.csv')[['temperature','ntk_alpha','n_match','accuracy']])"

@@ -5,7 +5,7 @@
 
 English: [README_EN.md](README_EN.md)
 
-本仓库提供相位调制检索增强 Transformer 在 MedQA 医学问答上的完整训练与评测流程：代码、数据处理脚本、测试参考结果；**大体积权重 / 语料 / Embedding 请从 ModelScope 下载**（见下文）。参考最优 **1197/1273 ≈ 0.9403**（`temperature=0.7`，`ntk_alpha=0.4`）；复现实测 best 约 **1199/1273 ≈ 0.9419**。
+本仓库提供相位调制检索增强 Transformer 在 MedQA 医学问答上的完整训练与评测流程：代码、数据处理脚本、测试参考结果；**大体积权重 / 语料 / Embedding 请从 ModelScope 下载**（见下文）。
 
 > 训练使用固定随机种子 `1337`，仍可能因 GPU 非确定性出现极小数值差；完整配方跑通后，测试准确率应落在参考结果附近。
 
@@ -485,7 +485,7 @@ TEMPS=0.7 NTKS=0.4 \
   bash scripts/eval_medqa_test.sh
 ```
 
-默认：`temperature=0.7`，`ntk_alpha=0.4`（与参考最优一致）。
+默认：`temperature=0.7`，`ntk_alpha=0.4`。
 
 完整参数网格：
 
@@ -507,8 +507,6 @@ TEMPS=0.7,0.9,1.1,1.3,1.5 NTKS=0.4,0.6,0.8,1.0,1.2 \
 | `n_match` | 预测与 `answer_idx` 一致的条数 |
 | `accuracy` | `n_match / n_scored` |
 | `output_csv` | 该组设置的逐条结果 |
-
-参考最优：temp=0.7，ntk=0.4 → **1197 / 1273 ≈ 0.9403**。
 
 ```bash
 python -c "import pandas as pd; print(pd.read_csv('results/medqa_intent_test1273_eval/summary.csv')[['temperature','ntk_alpha','n_match','accuracy']])"

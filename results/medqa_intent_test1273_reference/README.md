@@ -11,4 +11,4 @@ CHECKPOINT=out/run_sft_intent/sft_intent_QF_en_1024_best.pth \
   bash scripts/eval_medqa_test.sh
 ```
 
-参考最优：`temperature=0.7`，`ntk_alpha=0.4` → **1197/1273 ≈ 0.9403**。
+默认评测设置：`temperature=0.7`，`ntk_alpha=0.4`。
