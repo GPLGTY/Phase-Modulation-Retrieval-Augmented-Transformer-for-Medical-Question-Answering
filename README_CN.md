@@ -293,11 +293,79 @@ export VOLCENGINE_ARK_API_KEY='你的密钥'   # 或 ARK_API_KEY
 # 也可在命令行传 --api_key '你的密钥'
 ```
 
-默认 `base_url` 为火山方舟；本地 vLLM / Ollama 等可改 `--base_url`（常见为 `.../v1`），`--api_key` 可填非空占位如 `EMPTY`。
+默认 `base_url` 为火山方舟。也可用本地 **vLLM**（OpenAI 兼容 `/v1`）部署 Distill 等模型生成数据，见下节。
 
 `--in_json` 必须指向第 3 步 `question_with_options` 产物。可选：加 `--with_rag`，把检索知识写入 LLM 提示。
 
-**MedQA（英文 US）— 训练 / 验证 / 测试**（承接第 3 步 US 检索）
+##### 本地部署 DeepSeek Distill（vLLM）并生成 Intent
+
+适用于 `DeepSeek-R1-Distill-Qwen-32B`、`DeepSeek-R1-Distill-Llama-70B` 等。权重可从 Hugging Face 或 ModelScope 下载，例如：
+
+| 模型 | Hugging Face | ModelScope（示例） |
+|------|----------------|-------------------|
+| Distill-Qwen-32B | `deepseek-ai/DeepSeek-R1-Distill-Qwen-32B` | `deepseek-ai/DeepSeek-R1-Distill-Qwen-32B` |
+| Distill-Llama-70B | `deepseek-ai/DeepSeek-R1-Distill-Llama-70B` | `deepseek-ai/DeepSeek-R1-Distill-Llama-70B` |
+
+**显存参考**（bf16 / 未量化，视实现与并行方式浮动）：Qwen-32B 约需 **1–2×80GB**；Llama-70B 约需 **2–4×80GB**（可用 `--tensor-parallel-size`）。显存不足时可换 AWQ/GPTQ 等量化权重，并相应改启动参数。
+
+**1）启动 vLLM（OpenAI 兼容服务）**
+
+```bash
+# 示例：32B，单机多卡按需改 --tensor-parallel-size
+pip install -U vllm
+
+python -m vllm.entrypoints.openai.api_server \
+  --model deepseek-ai/DeepSeek-R1-Distill-Qwen-32B \
+  --host 0.0.0.0 --port 8000 \
+  --dtype bfloat16 \
+  --tensor-parallel-size 2 \
+  --max-model-len 8192
+
+# 70B 示例（更多卡）
+# python -m vllm.entrypoints.openai.api_server \
+#   --model deepseek-ai/DeepSeek-R1-Distill-Llama-70B \
+#   --host 0.0.0.0 --port 8000 \
+#   --dtype bfloat16 \
+#   --tensor-parallel-size 4 \
+#   --max-model-len 8192
+```
+
+服务就绪后，`base_url` 一般为 `http://127.0.0.1:8000/v1`；`--api_key` 填任意非空占位（如 `EMPTY`）。`--model` 须与 vLLM 的 `--model` 名称（或你在服务端注册的 served-model-name）一致。
+
+**2）用本地模型跑 Intent 生成（MedQA US 示例）**
+
+```bash
+cd dataset/pipeline
+
+# 训练集（32B；70B 时把 --model 换成 DeepSeek-R1-Distill-Llama-70B）
+python generate_intent_from_retrieval.py \
+  --in_json ../pipeline_data/questions_with_knowledge/US/train/retrive_use_question_with_options/stella-base-en-v2/train.json \
+  --out_json ../RAG_MedQA_US_train_intent.json \
+  --base_url http://127.0.0.1:8000/v1 \
+  --api_key EMPTY \
+  --model deepseek-ai/DeepSeek-R1-Distill-Qwen-32B \
+  --workers 4 --temperature 0.7 --max_tokens 4096
+
+# 验证集 / 测试集：仅改 --in_json / --out_json（路径同下方云端示例）
+```
+
+**3）MedMCQA 示例（同样指向本地 vLLM）**
+
+```bash
+cd dataset/pipeline
+
+python generate_intent_from_retrieval.py \
+  --in_json ../pipeline_data/questions_with_knowledge/MedMCQA/train/retrive_use_question_with_options/stella-base-en-v2/train.json \
+  --out_json ../RAG_MedMCQA_train_intent.json \
+  --base_url http://127.0.0.1:8000/v1 \
+  --api_key EMPTY \
+  --model deepseek-ai/DeepSeek-R1-Distill-Llama-70B \
+  --workers 2 --temperature 0.7 --max_tokens 4096
+```
+
+本地并发 `--workers` 不宜过大，以免打满 GPU 队列；可按吞吐再调。
+
+**MedQA（英文 US）— 训练 / 验证 / 测试**（承接第 3 步 US 检索；以下为云端 API 示例，本地部署时按上节改 `--base_url` / `--api_key` / `--model`）
 
 ```bash
 cd dataset/pipeline
@@ -324,7 +392,7 @@ python generate_intent_from_retrieval.py \
   --workers 8 --temperature 0.7 --max_tokens 4096
 ```
 
-**MedMCQA — 训练集 / 验证集**（承接第 3 步 MedMCQA 转换 + 检索）
+**MedMCQA — 训练集 / 验证集**（承接第 3 步 MedMCQA 转换 + 检索；云端 API 示例）
 
 ```bash
 cd dataset/pipeline

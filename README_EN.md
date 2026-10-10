@@ -280,11 +280,77 @@ export VOLCENGINE_ARK_API_KEY='your_key'   # or ARK_API_KEY
 # or pass --api_key 'your_key'
 ```
 
-Default `base_url` is Volcengine Ark; for local vLLM/Ollama set `--base_url` (often `.../v1`) and a non-empty `--api_key` such as `EMPTY`.
+Default `base_url` is Volcengine Ark. You can also serve Distill models locally with **vLLM** (OpenAI-compatible `/v1`); see below.
 
 `--in_json` must be step-3 `question_with_options` output. Optionally add `--with_rag` to put retrieved passages in the LLM prompt.
 
-**MedQA (English US) — train / val / test** (after step-3 US retrieval)
+##### Local DeepSeek Distill (vLLM) for Intent generation
+
+Works for `DeepSeek-R1-Distill-Qwen-32B`, `DeepSeek-R1-Distill-Llama-70B`, and similar. Download weights from Hugging Face or ModelScope, e.g.:
+
+| Model | Hugging Face | ModelScope (example) |
+|-------|----------------|----------------------|
+| Distill-Qwen-32B | `deepseek-ai/DeepSeek-R1-Distill-Qwen-32B` | `deepseek-ai/DeepSeek-R1-Distill-Qwen-32B` |
+| Distill-Llama-70B | `deepseek-ai/DeepSeek-R1-Distill-Llama-70B` | `deepseek-ai/DeepSeek-R1-Distill-Llama-70B` |
+
+**GPU memory (rough, bf16, unquantized):** Qwen-32B ≈ **1–2×80GB**; Llama-70B ≈ **2–4×80GB** (use `--tensor-parallel-size`). For smaller GPUs, use AWQ/GPTQ (or similar) and adjust launch flags.
+
+**1) Start vLLM (OpenAI-compatible server)**
+
+```bash
+pip install -U vllm
+
+python -m vllm.entrypoints.openai.api_server \
+  --model deepseek-ai/DeepSeek-R1-Distill-Qwen-32B \
+  --host 0.0.0.0 --port 8000 \
+  --dtype bfloat16 \
+  --tensor-parallel-size 2 \
+  --max-model-len 8192
+
+# 70B example (more GPUs)
+# python -m vllm.entrypoints.openai.api_server \
+#   --model deepseek-ai/DeepSeek-R1-Distill-Llama-70B \
+#   --host 0.0.0.0 --port 8000 \
+#   --dtype bfloat16 \
+#   --tensor-parallel-size 4 \
+#   --max-model-len 8192
+```
+
+Then set `--base_url http://127.0.0.1:8000/v1`, any non-empty `--api_key` (e.g. `EMPTY`), and `--model` matching the vLLM `--model` (or served-model-name).
+
+**2) Generate Intent with the local server (MedQA US)**
+
+```bash
+cd dataset/pipeline
+
+python generate_intent_from_retrieval.py \
+  --in_json ../pipeline_data/questions_with_knowledge/US/train/retrive_use_question_with_options/stella-base-en-v2/train.json \
+  --out_json ../RAG_MedQA_US_train_intent.json \
+  --base_url http://127.0.0.1:8000/v1 \
+  --api_key EMPTY \
+  --model deepseek-ai/DeepSeek-R1-Distill-Qwen-32B \
+  --workers 4 --temperature 0.7 --max_tokens 4096
+
+# Val / test: only change --in_json / --out_json (same paths as the cloud examples below)
+```
+
+**3) MedMCQA example (local vLLM)**
+
+```bash
+cd dataset/pipeline
+
+python generate_intent_from_retrieval.py \
+  --in_json ../pipeline_data/questions_with_knowledge/MedMCQA/train/retrive_use_question_with_options/stella-base-en-v2/train.json \
+  --out_json ../RAG_MedMCQA_train_intent.json \
+  --base_url http://127.0.0.1:8000/v1 \
+  --api_key EMPTY \
+  --model deepseek-ai/DeepSeek-R1-Distill-Llama-70B \
+  --workers 2 --temperature 0.7 --max_tokens 4096
+```
+
+Keep `--workers` moderate so the GPU queue is not saturated.
+
+**MedQA (English US) — train / val / test** (after step-3 US retrieval; cloud API examples — for local vLLM, set `--base_url` / `--api_key` / `--model` as above)
 
 ```bash
 cd dataset/pipeline
@@ -311,7 +377,7 @@ python generate_intent_from_retrieval.py \
   --workers 8 --temperature 0.7 --max_tokens 4096
 ```
 
-**MedMCQA — train / validation** (after step-3 MedMCQA convert + retrieve)
+**MedMCQA — train / validation** (after step-3 MedMCQA convert + retrieve; cloud API examples)
 
 ```bash
 cd dataset/pipeline
