@@ -5,6 +5,8 @@
 
 English: [README_EN.md](README_EN.md)
 
+GitHub: https://github.com/GPLGTY/Phase-modulation-transforme
+
 本仓库提供相位调制检索增强 Transformer 在 MedQA 医学问答上的完整训练与评测流程：代码、数据处理脚本、测试参考结果；**大体积权重 / 语料 / Embedding 请从 ModelScope 下载**（见下文）。
 
 > 训练使用固定随机种子 `1337`，仍可能因 GPU 非确定性出现极小数值差；完整配方跑通后，测试准确率应落在参考结果附近。

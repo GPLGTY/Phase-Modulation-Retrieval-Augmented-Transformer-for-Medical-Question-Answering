@@ -5,6 +5,8 @@
 
 中文说明：[README.md](README.md) / [README_CN.md](README_CN.md)
 
+GitHub: https://github.com/GPLGTY/Phase-modulation-transforme
+
 This repository provides the full training and evaluation pipeline for a phase-modulation retrieval-augmented Transformer on MedQA: code, data scripts, and reference results. **Large weights / corpora / embeddings are hosted on ModelScope** (see below).
 
 > Training uses seed `1337`; tiny GPU nondeterminism may remain. After the same recipe, test accuracy should be near the reference.
